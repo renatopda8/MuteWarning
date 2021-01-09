@@ -1,4 +1,5 @@
 ﻿using OBSWebsocketDotNet;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -22,28 +23,8 @@ namespace MuteWarning
         {
             _obs = new OBSWebsocket();
 
-            if (!_obs.IsConnected)
-            {
-                try
-                {
-                    _obs.Connect("ws://127.0.0.1:4444", "?;(H_Qfwe8dqaf2k");
-                }
-                catch (AuthFailureException)
-                {
-                    MessageBox.Show("Authentication failed.", "Error");
-                    Application.Current.Shutdown();
-                    return;
-                }
-                catch (ErrorResponseException ex)
-                {
-                    MessageBox.Show("Connect failed : " + ex.Message, "Error");
-                    Application.Current.Shutdown();
-                    return;
-                }
-            }
-
-            bool isMuted = false;
-            SetVisible(isMuted);
+            Connect();
+            SetVisible(false);
 
             _obs.SourceMuteStateChanged += SourceMuteStateChanged;
 
@@ -65,7 +46,7 @@ namespace MuteWarning
 
         private void SetVisible(bool isVisible)
         {
-            this.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+            this.Visibility = isVisible ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -81,6 +62,71 @@ namespace MuteWarning
             {
                 base.OnClosing(e);
             }
+        }
+
+        private void CheckConnectionButtons()
+        {
+            ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = _obs.IsConnected);
+        }
+
+        private void Connect()
+        {
+            try
+            {
+                _obs.Connect("ws://127.0.0.1:4444", "?;(H_Qfwe8dqaf2k");
+
+                if (!_obs.IsConnected)
+                {
+                    throw new Exception("Connection failed");
+                }
+
+                CheckConnectionButtons();
+            }
+            catch (AuthFailureException)
+            {
+                MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+            }
+        }
+
+
+        private void Disconnect()
+        {
+            try
+            {
+                _obs.Disconnect();
+                
+                if (_obs.IsConnected)
+                {
+                    throw new Exception("Disconnection failed");
+                }
+
+                CheckConnectionButtons();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Disconnect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Connect_Click(object sender, RoutedEventArgs e)
+        {
+            Connect();
+        }
+
+        private void Disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            Disconnect();
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

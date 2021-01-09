@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MuteWarning"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Title="MuteWarning" Height="100" Width="100"
         AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False"
@@ -11,5 +12,19 @@
         WindowStartupLocation="CenterScreen" >
     <Grid>
         <Image x:Name="image" Margin="2" Source="/micMuted.png" />
+        <tb:TaskbarIcon x:Name="myNotifyIcon"
+                    Visibility="Visible"
+                    ToolTipText="Mute Warning"
+                    IconSource="micMuted.ico"
+                    MenuActivation="LeftOrRightClick"
+                    PopupActivation="DoubleClick">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="ConnectMenuItem" Header="Connect" Click="Connect_Click"/>
+                    <MenuItem x:Name="DisconnectMenuItem" Header="Disconnect" Click="Disconnect_Click"/>
+                    <MenuItem x:Name="ExitMenuItem" Header="Exit" Click="Exit_Click"/>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
     </Grid>
 </Window>
