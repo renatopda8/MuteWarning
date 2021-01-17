@@ -23,12 +23,16 @@ namespace MuteWarning
         {
             _obs = new OBSWebsocket();
 
-            Connect(false);
             SetVisible(false);
 
             _obs.SourceMuteStateChanged += SourceMuteStateChanged;
 
             MouseDown += Window_MouseDown;
+
+            RunOnBackground(() =>
+            {
+                Connect(false);
+            });
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -41,12 +45,12 @@ namespace MuteWarning
 
         private void SourceMuteStateChanged(OBSWebsocket sender, string sourceName, bool muted)
         {
-            Dispatcher.Invoke(() => SetVisible(muted));
+            SetVisible(muted);
         }
 
         private void SetVisible(bool isVisible)
         {
-            this.Visibility = isVisible ? Visibility.Visible : Visibility.Hidden;
+            Dispatcher.Invoke(() => this.Visibility = isVisible ? Visibility.Visible : Visibility.Hidden);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -68,7 +72,7 @@ namespace MuteWarning
 
         private void CheckConnectionButtons()
         {
-            ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = IsConnected);
+            Dispatcher.Invoke(() => ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = IsConnected));
         }
 
         private void Connect(bool showMessages = true)
@@ -87,14 +91,14 @@ namespace MuteWarning
                 if (showMessages)
                 {
                     MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
+                }                
             }
             catch (Exception ex)
             {
                 if (showMessages)
                 {
                     MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }                
+                }
             }
             finally
             {
@@ -107,7 +111,7 @@ namespace MuteWarning
             try
             {
                 _obs.Disconnect();
-                
+
                 if (IsConnected)
                 {
                     throw new Exception("Disconnection failed");
@@ -118,7 +122,7 @@ namespace MuteWarning
                 if (showMessages)
                 {
                     MessageBox.Show($"Disconnect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }                
+                }
             }
             finally
             {
@@ -126,19 +130,35 @@ namespace MuteWarning
             }
         }
 
+        private void Exit()
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void RunOnBackground(Action action)
+        {
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (object sender, DoWorkEventArgs e) =>
+            {
+                action?.Invoke();
+            };
+
+            bw.RunWorkerAsync();
+        }
+
         private void Connect_Click(object sender, RoutedEventArgs e)
         {
-            Connect();
+            RunOnBackground(() => Connect());
         }
 
         private void Disconnect_Click(object sender, RoutedEventArgs e)
         {
-            Disconnect();
+            RunOnBackground(() => Disconnect());
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            Exit();
         }
     }
 }
