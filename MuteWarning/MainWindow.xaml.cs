@@ -53,9 +53,9 @@ namespace MuteWarning
         {
             try
             {
-                if (_obs.IsConnected)
+                if (IsConnected)
                 {
-                    _obs.Disconnect();
+                    Disconnect();
                 }
             }
             finally
@@ -63,6 +63,8 @@ namespace MuteWarning
                 base.OnClosing(e);
             }
         }
+
+        private bool IsConnected => _obs.IsConnected;
 
         private void CheckConnectionButtons()
         {
@@ -75,7 +77,7 @@ namespace MuteWarning
             {
                 _obs.Connect("ws://127.0.0.1:4444", "?;(H_Qfwe8dqaf2k");
 
-                if (!_obs.IsConnected)
+                if (!IsConnected)
                 {
                     throw new Exception("Connection failed");
                 }
@@ -85,12 +87,10 @@ namespace MuteWarning
             catch (AuthFailureException)
             {
                 MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                Application.Current.Shutdown();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown();
             }
         }
 
@@ -101,7 +101,7 @@ namespace MuteWarning
             {
                 _obs.Disconnect();
                 
-                if (_obs.IsConnected)
+                if (IsConnected)
                 {
                     throw new Exception("Disconnection failed");
                 }
