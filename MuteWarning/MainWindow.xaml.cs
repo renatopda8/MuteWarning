@@ -23,7 +23,7 @@ namespace MuteWarning
         {
             _obs = new OBSWebsocket();
 
-            Connect();
+            Connect(false);
             SetVisible(false);
 
             _obs.SourceMuteStateChanged += SourceMuteStateChanged;
@@ -55,7 +55,7 @@ namespace MuteWarning
             {
                 if (IsConnected)
                 {
-                    Disconnect();
+                    Disconnect(false);
                 }
             }
             finally
@@ -68,10 +68,10 @@ namespace MuteWarning
 
         private void CheckConnectionButtons()
         {
-            ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = _obs.IsConnected);
+            ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = IsConnected);
         }
 
-        private void Connect()
+        private void Connect(bool showMessages = true)
         {
             try
             {
@@ -81,21 +81,28 @@ namespace MuteWarning
                 {
                     throw new Exception("Connection failed");
                 }
-
-                CheckConnectionButtons();
             }
             catch (AuthFailureException)
             {
-                MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                if (showMessages)
+                {
+                    MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (showMessages)
+                {
+                    MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }                
+            }
+            finally
+            {
+                CheckConnectionButtons();
             }
         }
 
-
-        private void Disconnect()
+        private void Disconnect(bool showMessages = true)
         {
             try
             {
@@ -105,12 +112,17 @@ namespace MuteWarning
                 {
                     throw new Exception("Disconnection failed");
                 }
-
-                CheckConnectionButtons();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Disconnect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (showMessages)
+                {
+                    MessageBox.Show($"Disconnect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }                
+            }
+            finally
+            {
+                CheckConnectionButtons();
             }
         }
 
