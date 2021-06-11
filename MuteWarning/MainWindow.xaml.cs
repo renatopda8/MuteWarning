@@ -1,6 +1,8 @@
 ﻿using OBSWebsocketDotNet;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,21 +13,35 @@ namespace MuteWarning
     /// </summary>
     public partial class MainWindow : Window
     {
-        protected OBSWebsocket _obs;
+        private Dictionary<string, bool> _isSourceMuted;
+
+        private OBSWebsocket OBS { get; }
+        private Dictionary<string, bool> IsSourceMuted
+        {
+            get => _isSourceMuted;
+            set
+            {
+                _isSourceMuted = value ?? new Dictionary<string, bool>();
+                CheckVisibility();
+            }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+
+            OBS = new OBSWebsocket();
+            IsSourceMuted = new Dictionary<string, bool>();
+
             Initialize();
         }
 
         private void Initialize()
         {
-            _obs = new OBSWebsocket();
-
             SetVisible(false);
 
-            _obs.SourceMuteStateChanged += SourceMuteStateChanged;
+            OBS.SourceMuteStateChanged += SourceMuteStateChanged;
+            OBS.Disconnected += Disconnected;
 
             MouseDown += Window_MouseDown;
 
@@ -33,6 +49,11 @@ namespace MuteWarning
             {
                 Connect(false);
             });
+        }
+
+        private void Disconnected(object sender, EventArgs e)
+        {
+            Disconnect(false);
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -45,7 +66,13 @@ namespace MuteWarning
 
         private void SourceMuteStateChanged(OBSWebsocket sender, string sourceName, bool muted)
         {
-            SetVisible(muted);
+            if (!IsSourceMuted.ContainsKey(sourceName))
+            {
+                IsSourceMuted.Add(sourceName, muted);
+            }
+
+            IsSourceMuted[sourceName] = muted;
+            CheckVisibility();
         }
 
         private void SetVisible(bool isVisible)
@@ -68,30 +95,39 @@ namespace MuteWarning
             }
         }
 
-        private bool IsConnected => _obs.IsConnected;
+        private bool IsConnected => OBS.IsConnected;
 
         private void CheckConnectionButtons()
         {
             Dispatcher.Invoke(() => ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = IsConnected));
         }
 
+        private void CheckVisibility()
+        {
+            SetVisible(IsSourceMuted.Any(s => s.Value));
+        }
+
         private void Connect(bool showMessages = true)
         {
             try
             {
-                _obs.Connect("ws://127.0.0.1:4444", "?;(H_Qfwe8dqaf2k");
+                OBS.Connect("ws://127.0.0.1:4444", "?;(H_Qfwe8dqaf2k");
 
                 if (!IsConnected)
                 {
                     throw new Exception("Connection failed");
                 }
+
+                IsSourceMuted = OBS.GetSourcesList()
+                    .Where(si => "input".Equals(si.Type) && ("wasapi_output_capture".Equals(si.TypeID) || "wasapi_input_capture".Equals(si.TypeID)))
+                    .ToDictionary(si => si.Name, si => OBS.GetMute(si.Name));
             }
             catch (AuthFailureException)
             {
                 if (showMessages)
                 {
                     MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -110,12 +146,14 @@ namespace MuteWarning
         {
             try
             {
-                _obs.Disconnect();
+                OBS.Disconnect();
 
                 if (IsConnected)
                 {
                     throw new Exception("Disconnection failed");
                 }
+
+                IsSourceMuted = new Dictionary<string, bool>();
             }
             catch (Exception ex)
             {
