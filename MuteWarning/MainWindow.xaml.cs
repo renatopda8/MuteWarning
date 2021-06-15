@@ -1,6 +1,5 @@
 ﻿using OBSWebsocketDotNet;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -13,25 +12,16 @@ namespace MuteWarning
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Dictionary<string, bool> _isSourceMuted;
+        private AudioSourcesControl SourcesControl { get; }
 
         private OBSWebsocket OBS { get; }
-        private Dictionary<string, bool> IsSourceMuted
-        {
-            get => _isSourceMuted;
-            set
-            {
-                _isSourceMuted = value ?? new Dictionary<string, bool>();
-                CheckVisibility();
-            }
-        }
 
         public MainWindow()
         {
             InitializeComponent();
 
             OBS = new OBSWebsocket();
-            IsSourceMuted = new Dictionary<string, bool>();
+            SourcesControl = new AudioSourcesControl(OnSourceUpdated);
 
             Initialize();
         }
@@ -66,13 +56,7 @@ namespace MuteWarning
 
         private void SourceMuteStateChanged(OBSWebsocket sender, string sourceName, bool muted)
         {
-            if (!IsSourceMuted.ContainsKey(sourceName))
-            {
-                IsSourceMuted.Add(sourceName, muted);
-            }
-
-            IsSourceMuted[sourceName] = muted;
-            CheckVisibility();
+            SourcesControl.UpdateSource(sourceName, muted);
         }
 
         private void SetVisible(bool isVisible)
@@ -102,9 +86,9 @@ namespace MuteWarning
             Dispatcher.Invoke(() => ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = IsConnected));
         }
 
-        private void CheckVisibility()
+        private void OnSourceUpdated(bool isAnySourceMuted)
         {
-            SetVisible(IsSourceMuted.Any(s => s.Value));
+            SetVisible(isAnySourceMuted);
         }
 
         private void Connect(bool showMessages = true)
@@ -118,9 +102,12 @@ namespace MuteWarning
                     throw new Exception("Connection failed");
                 }
 
-                IsSourceMuted = OBS.GetSourcesList()
-                    .Where(si => "input".Equals(si.Type) && ("wasapi_output_capture".Equals(si.TypeID) || "wasapi_input_capture".Equals(si.TypeID)))
-                    .ToDictionary(si => si.Name, si => OBS.GetMute(si.Name));
+                SourcesControl.SetSources(
+                    OBS.GetSourcesList()
+                        .Where(si => "input".Equals(si.Type) && ("wasapi_output_capture".Equals(si.TypeID) || "wasapi_input_capture".Equals(si.TypeID)))
+                        .Select(si => new AudioSource(si.Name, OBS.GetMute(si.Name)))
+                        .ToArray()
+                );
             }
             catch (AuthFailureException)
             {
@@ -153,7 +140,7 @@ namespace MuteWarning
                     throw new Exception("Disconnection failed");
                 }
 
-                IsSourceMuted = new Dictionary<string, bool>();
+                SourcesControl.ClearSources();
             }
             catch (Exception ex)
             {
