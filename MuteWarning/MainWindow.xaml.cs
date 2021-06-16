@@ -95,7 +95,7 @@ namespace MuteWarning
         {
             try
             {
-                OBS.Connect("ws://127.0.0.1:4444", "?;(H_Qfwe8dqaf2k");
+                OBS.Connect(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);
 
                 if (!IsConnected)
                 {
