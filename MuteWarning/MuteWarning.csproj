@@ -8,14 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="App.config" />
     <None Remove="favicon.ico" />
     <None Remove="micMuted.ico" />
     <None Remove="micMuted.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="App.config" />
   </ItemGroup>
 
   <ItemGroup>
