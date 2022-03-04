@@ -7,11 +7,12 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Title="MuteWarning" Height="100" Width="100"
-        AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False"
-        ResizeMode="NoResize" Background="Transparent" Topmost="True" 
-        WindowStartupLocation="CenterScreen" >
+        AllowsTransparency="True" WindowStyle="None"
+        ShowInTaskbar="False" Topmost="True" Background="Transparent"
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        MouseDown="Window_MouseDown" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="image" Margin="2" Source="/micMuted.png" />
+        <Image x:Name="image" Margin="2" Source="/micMuted.png" Opacity="0.90"/>
         <tb:TaskbarIcon x:Name="myNotifyIcon"
                     Visibility="Visible"
                     ToolTipText="Mute Warning"
