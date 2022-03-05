@@ -9,8 +9,8 @@
         Title="MuteWarning" Height="100" Width="100"
         AllowsTransparency="True" WindowStyle="None"
         ShowInTaskbar="False" Topmost="True" Background="Transparent"
-        ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        MouseDown="Window_MouseDown" Loaded="Window_Loaded">
+        MouseDown="Window_MouseDown" MouseUp="Window_MouseUp"
+        ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
         <Image x:Name="image" Margin="2" Source="/micMuted.png" Opacity="0.90"/>
         <tb:TaskbarIcon x:Name="myNotifyIcon"

@@ -35,6 +35,16 @@ namespace MuteWarning
             OBS.SourceMuteStateChanged += SourceMuteStateChanged;
             OBS.Disconnected += Disconnected;
 
+            if (Configuration.Settings.IconPosition.HasValue)
+            {
+                Left = Configuration.Settings.IconPosition.Value.X;
+                Top = Configuration.Settings.IconPosition.Value.Y;
+            }
+            else
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+
             RunOnBackground(() =>
             {
                 Connect(false);
@@ -51,6 +61,14 @@ namespace MuteWarning
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
+            }
+        }
+
+        private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                Configuration.Settings.IconPosition = new Point(Left, Top);
             }
         }
 
@@ -82,6 +100,8 @@ namespace MuteWarning
                 {
                     Disconnect(false);
                 }
+
+                Configuration.Settings.Save();
             }
             finally
             {
