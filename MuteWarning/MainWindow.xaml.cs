@@ -105,6 +105,11 @@ namespace MuteWarning
         {
             try
             {
+                if (IsConnected)
+                {
+                    return;
+                }
+
                 OBS.Connect(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);
 
                 if (!IsConnected)
@@ -143,6 +148,11 @@ namespace MuteWarning
         {
             try
             {
+                if (!IsConnected)
+                {
+                    return;
+                }
+
                 OBS.Disconnect();
 
                 if (IsConnected)
