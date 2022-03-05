@@ -12,7 +12,7 @@
         MouseDown="Window_MouseDown" MouseUp="Window_MouseUp"
         ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="image" Margin="2" Source="/micMuted.png" Opacity="0.90"/>
+        <Image x:Name="image" Margin="2" Source="/micMuted.png" Opacity="0.70"/>
         <tb:TaskbarIcon x:Name="myNotifyIcon"
                     Visibility="Visible"
                     ToolTipText="Mute Warning"
@@ -23,6 +23,8 @@
                 <ContextMenu>
                     <MenuItem x:Name="ConnectMenuItem" Header="Connect" Click="Connect_Click"/>
                     <MenuItem x:Name="DisconnectMenuItem" Header="Disconnect" Click="Disconnect_Click" IsEnabled="False"/>
+                    <MenuItem x:Name="LockIconMenuItem" Header="Lock Icon" Click="LockIcon_Click" IsEnabled="False"/>
+                    <MenuItem x:Name="UnlockIconMenuItem" Header="Unlock Icon" Click="UnlockIcon_Click"/>
                     <MenuItem x:Name="ExitMenuItem" Header="Exit" Click="Exit_Click"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>

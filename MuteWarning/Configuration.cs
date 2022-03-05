@@ -53,5 +53,10 @@ namespace MuteWarning
         /// Posição do ícone na tela durante a última execução
         /// </summary>
         public Point? IconPosition { get; set; }
+
+        /// <summary>
+        /// Define se o ícone está fixado na posição atual e permitindo cliques através da imagem
+        /// </summary>
+        public bool IsIconLocked { get; set; }
     }
 }

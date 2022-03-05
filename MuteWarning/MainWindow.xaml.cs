@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -74,12 +73,38 @@ namespace MuteWarning
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            WindowInteropHelper wndHelper = new WindowInteropHelper(this);
+            try
+            {
+                if (Configuration.Settings.IsIconLocked)
+                {
+                    ChangeWindowStyles(WindowStylesOperations.Set,
+                        WindowHelper.ExtendedWindowStyles.WS_EX_TOOLWINDOW,
+                        WindowHelper.ExtendedWindowStyles.WS_EX_TRANSPARENT);
+                }
+                else
+                {
+                    ChangeWindowStyles(WindowStylesOperations.Set,
+                        WindowHelper.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
+                }
+            }
+            finally
+            {
+                CheckIconLockButtons();
+            }
+        }
 
-            int exStyle = (int) GetWindowLong(wndHelper.Handle, (int) GetWindowLongFields.GWL_EXSTYLE);
-
-            exStyle |= (int) ExtendedWindowStyles.WS_EX_TOOLWINDOW;
-            SetWindowLong(wndHelper.Handle, (int) GetWindowLongFields.GWL_EXSTYLE, (IntPtr) exStyle);
+        private void ChangeIconLockState()
+        {
+            try
+            {
+                var operation = Configuration.Settings.IsIconLocked ? WindowStylesOperations.Remove : WindowStylesOperations.Set;
+                ChangeWindowStyles(operation, WindowHelper.ExtendedWindowStyles.WS_EX_TRANSPARENT);
+                Configuration.Settings.IsIconLocked = !Configuration.Settings.IsIconLocked;
+            }
+            finally
+            {
+                CheckIconLockButtons();
+            }
         }
 
         private void SourceMuteStateChanged(OBSWebsocket sender, string sourceName, bool muted)
@@ -114,6 +139,11 @@ namespace MuteWarning
         private void CheckConnectionButtons()
         {
             Dispatcher.Invoke(() => ConnectMenuItem.IsEnabled = !(DisconnectMenuItem.IsEnabled = IsConnected));
+        }
+
+        private void CheckIconLockButtons()
+        {
+            Dispatcher.Invoke(() => LockIconMenuItem.IsEnabled = !(UnlockIconMenuItem.IsEnabled = Configuration.Settings.IsIconLocked));
         }
 
         private void OnSourceUpdated(bool isAnySourceMuted)
@@ -221,6 +251,16 @@ namespace MuteWarning
             RunOnBackground(() => Disconnect());
         }
 
+        private void LockIcon_Click(object sender, RoutedEventArgs e)
+        {
+            ChangeIconLockState();
+        }
+
+        private void UnlockIcon_Click(object sender, RoutedEventArgs e)
+        {
+            ChangeIconLockState();
+        }
+
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             Exit();
@@ -228,66 +268,36 @@ namespace MuteWarning
 
         #region Window styles
 
-        [Flags]
-        public enum ExtendedWindowStyles
+        public enum WindowStylesOperations
         {
-            // ...
-            WS_EX_TOOLWINDOW = 0x00000080,
-            // ...
+            Set,
+            Remove
         }
 
-        public enum GetWindowLongFields
+        private void ChangeWindowStyles(WindowStylesOperations operation, params WindowHelper.ExtendedWindowStyles[] styles)
         {
-            // ...
-            GWL_EXSTYLE = (-20),
-            // ...
-        }
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
-
-        public static IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
-        {
-            int error = 0;
-            IntPtr result = IntPtr.Zero;
-            // Win32 SetWindowLong doesn't clear error on success
-            SetLastError(0);
-
-            if (IntPtr.Size == 4)
+            if (styles?.Any() != true)
             {
-                // use SetWindowLong
-                Int32 tempResult = IntSetWindowLong(hWnd, nIndex, IntPtrToInt32(dwNewLong));
-                error = Marshal.GetLastWin32Error();
-                result = new IntPtr(tempResult);
-            }
-            else
-            {
-                // use SetWindowLongPtr
-                result = IntSetWindowLongPtr(hWnd, nIndex, dwNewLong);
-                error = Marshal.GetLastWin32Error();
+                return;
             }
 
-            if ((result == IntPtr.Zero) && (error != 0))
+            WindowInteropHelper wndHelper = new WindowInteropHelper(this);
+            int exStyle = (int) WindowHelper.GetWindowLong(wndHelper.Handle, (int) WindowHelper.GetWindowLongFields.GWL_EXSTYLE);
+
+            foreach (var style in styles)
             {
-                throw new System.ComponentModel.Win32Exception(error);
+                if (WindowStylesOperations.Set == operation)
+                {
+                    exStyle |= (int) style;
+                }
+                else
+                {
+                    exStyle &= ~(int) style;
+                }
             }
 
-            return result;
+            WindowHelper.SetWindowLong(wndHelper.Handle, (int) WindowHelper.GetWindowLongFields.GWL_EXSTYLE, (IntPtr) exStyle);
         }
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
-        private static extern IntPtr IntSetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
-        private static extern Int32 IntSetWindowLong(IntPtr hWnd, int nIndex, Int32 dwNewLong);
-
-        private static int IntPtrToInt32(IntPtr intPtr)
-        {
-            return unchecked((int) intPtr.ToInt64());
-        }
-
-        [DllImport("kernel32.dll", EntryPoint = "SetLastError")]
-        public static extern void SetLastError(int dwErrorCode);
 
         #endregion
     }
