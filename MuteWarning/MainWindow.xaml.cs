@@ -13,10 +13,10 @@ namespace MuteWarning
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Settings _settings;
+        private SettingsWindow _settings;
 
         private AudioSourcesControl SourcesControl { get; }
-        private Settings SettingsWindow => _settings ??= new Settings();
+        private SettingsWindow SettingsWindow => _settings ??= new SettingsWindow();
         private OBSWebsocket OBS { get; }
 
         public MainWindow()

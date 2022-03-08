@@ -5,13 +5,13 @@ using System.Windows.Input;
 namespace MuteWarning
 {
     /// <summary>
-    /// Interaction logic for Settings.xaml
+    /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class Settings : Window
+    public partial class SettingsWindow : Window
     {
-        public static Configuration Configuration => Configuration.Settings;
+        public static Configuration Settings => Configuration.Settings;
 
-        public Settings()
+        public SettingsWindow()
         {
             InitializeComponent();
         }
@@ -33,16 +33,16 @@ namespace MuteWarning
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Configuration.ObsSocketUrl = ObsSocketUrlTextBox.Text;
-            Configuration.ObsSocketPassword = ObsSocketPasswordTextBox.Text;
+            Settings.ObsSocketUrl = ObsSocketUrlTextBox.Text;
+            Settings.ObsSocketPassword = ObsSocketPasswordTextBox.Text;
 
             Hide();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            ObsSocketUrlTextBox.Text = Configuration.ObsSocketUrl;
-            ObsSocketPasswordTextBox.Text = Configuration.ObsSocketPassword;
+            ObsSocketUrlTextBox.Text = Settings.ObsSocketUrl;
+            ObsSocketPasswordTextBox.Text = Settings.ObsSocketPassword;
 
             Hide();
         }
