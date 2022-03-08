@@ -116,7 +116,11 @@ namespace MuteWarning
 
         private void SetVisible(bool isVisible)
         {
-            Dispatcher.Invoke(() => this.Visibility = isVisible ? Visibility.Visible : Visibility.Hidden);
+            Dispatcher.Invoke(() =>
+            {
+                Visibility = isVisible ? Visibility.Visible : Visibility.Hidden;
+                CheckIconLockButtons();
+            });
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -145,7 +149,11 @@ namespace MuteWarning
 
         private void CheckIconLockButtons()
         {
-            Dispatcher.Invoke(() => LockIconMenuItem.IsEnabled = !(UnlockIconMenuItem.IsEnabled = Configuration.Settings.IsIconLocked));
+            Dispatcher.Invoke(() =>
+            {
+                LockIconMenuItem.IsEnabled = IsVisible && !Configuration.Settings.IsIconLocked;
+                UnlockIconMenuItem.IsEnabled = IsVisible && Configuration.Settings.IsIconLocked;
+            });
         }
 
         private void OnSourceUpdated(bool isAnySourceMuted)
@@ -160,6 +168,11 @@ namespace MuteWarning
                 if (IsConnected)
                 {
                     return;
+                }
+
+                if (string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketUrl) || string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketPassword))
+                {
+                    throw new Exception("Connection failed");
                 }
 
                 OBS.Connect(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);

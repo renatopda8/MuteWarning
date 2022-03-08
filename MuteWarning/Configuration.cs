@@ -26,7 +26,15 @@ namespace MuteWarning
         {
             if (!Directory.Exists(AppDataPath))
             {
-                throw new FileNotFoundException("The settings file could not be found.", SettingsFilePath);
+                Directory.CreateDirectory(AppDataPath);
+            }
+
+            if (!File.Exists(SettingsFilePath))
+            {
+                _settings = new Configuration();
+                _settings.Save();
+
+                return;
             }
 
             string settingsJson = File.ReadAllText(SettingsFilePath);

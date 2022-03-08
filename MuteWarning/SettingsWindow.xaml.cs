@@ -33,8 +33,8 @@ namespace MuteWarning
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Settings.ObsSocketUrl = ObsSocketUrlTextBox.Text;
-            Settings.ObsSocketPassword = ObsSocketPasswordTextBox.Text;
+            Settings.ObsSocketUrl = ObsSocketUrlTextBox.Text?.Trim();
+            Settings.ObsSocketPassword = ObsSocketPasswordTextBox.Text?.Trim();
 
             Hide();
         }
