@@ -21,7 +21,7 @@ namespace MuteWarning
             // ...
             GWL_EXSTYLE = (-20),
             // ...
-        }       
+        }
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
@@ -69,6 +69,5 @@ namespace MuteWarning
         [DllImport("kernel32.dll", EntryPoint = "SetLastError")]
         public static extern void SetLastError(int dwErrorCode);
 
-        
     }
 }
