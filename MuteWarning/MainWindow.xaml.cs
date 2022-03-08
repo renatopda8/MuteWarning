@@ -13,8 +13,10 @@ namespace MuteWarning
     /// </summary>
     public partial class MainWindow : Window
     {
-        private AudioSourcesControl SourcesControl { get; }
+        private Settings _settings;
 
+        private AudioSourcesControl SourcesControl { get; }
+        private Settings SettingsWindow => _settings ??= new Settings();
         private OBSWebsocket OBS { get; }
 
         public MainWindow()
@@ -259,6 +261,11 @@ namespace MuteWarning
         private void UnlockIcon_Click(object sender, RoutedEventArgs e)
         {
             ChangeIconLockState();
+        }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow.Show();
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)

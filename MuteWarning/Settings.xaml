@@ -1,0 +1,34 @@
+﻿<Window x:Class="MuteWarning.Settings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MuteWarning"
+        mc:Ignorable="d"
+        Title="Settings" Height="300" Width="400" WindowStyle="None"
+        ResizeMode="NoResize" 
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        MouseDown="Window_MouseDown"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <Window.Background>
+        <SolidColorBrush Color="Black" Opacity="0.3"/>
+    </Window.Background>
+    <Grid>
+        <Label x:Name="label"
+               Content="Settings"
+               Foreground="White"
+               HorizontalAlignment="Center"
+               HorizontalContentAlignment="Center"
+               Margin="0,10,0,0"
+               VerticalAlignment="Top"
+               Width="130" FontSize="20" FontWeight="Bold"/>
+        <TextBlock x:Name="ObsSocketUrlTextBlock" HorizontalAlignment="Left" Margin="30,60,0,0" TextWrapping="Wrap" Text="OBS Socket URL" Foreground="White" FontWeight="Bold" FontSize="16" Height="21" VerticalAlignment="Top"/>
+        <TextBox x:Name="ObsSocketUrlTextBox" Margin="30,86,30,0" TextWrapping="Wrap" Text="{Binding Configuration.ObsSocketUrl, Mode=OneWay}" VerticalAlignment="Top" FontSize="16"/>
+        <TextBlock x:Name="ObsSocketPasswordTextBlock" HorizontalAlignment="Left" Margin="30,137,0,0" TextWrapping="Wrap" Text="OBS Socket Password" VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="16"/>
+        <TextBox x:Name="ObsSocketPasswordTextBox" Margin="30,163,30,0" TextWrapping="Wrap" Text="{Binding Configuration.ObsSocketPassword, Mode=OneWay}" VerticalAlignment="Top" FontSize="16"/>
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="68,226,0,0" VerticalAlignment="Top" FontSize="18" Width="116" Background="#FF2D611F" FontWeight="Bold" Foreground="White" BorderBrush="Black" Height="40" Click="SaveButton_Click"/>
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="219,226,0,0" VerticalAlignment="Top" FontSize="18" Width="116" Foreground="White" BorderBrush="Black" Background="#FF5F1616" FontWeight="Bold" Height="40" Click="CancelButton_Click"/>
+
+    </Grid>
+</Window>

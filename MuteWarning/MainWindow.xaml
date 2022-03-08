@@ -25,6 +25,8 @@
                     <MenuItem x:Name="DisconnectMenuItem" Header="Disconnect" Click="Disconnect_Click" IsEnabled="False"/>
                     <MenuItem x:Name="LockIconMenuItem" Header="Lock Icon" Click="LockIcon_Click" IsEnabled="False"/>
                     <MenuItem x:Name="UnlockIconMenuItem" Header="Unlock Icon" Click="UnlockIcon_Click"/>
+                    <Separator/>
+                    <MenuItem x:Name="SettingsMenuItem" Header="Settings" Click="Settings_Click"/>
                     <MenuItem x:Name="ExitMenuItem" Header="Exit" Click="Exit_Click"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
