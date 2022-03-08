@@ -4,14 +4,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>micMuted.ico</ApplicationIcon>
+    <ApplicationIcon>Images\micMuted.ico</ApplicationIcon>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="favicon.ico" />
-    <None Remove="micMuted.ico" />
-    <None Remove="micMuted.png" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -25,10 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="micMuted.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="micMuted.png" />
+    <Resource Include="Images\micMuted.ico"/>
+    <Resource Include="Images\micMuted.png"/>
+    <Resource Include="Images\micMutedWhite.ico"/>
+    <Resource Include="Images\micMutedWhite.png"/>
   </ItemGroup>
-
+  
 </Project>

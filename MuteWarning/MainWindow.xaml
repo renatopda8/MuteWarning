@@ -12,11 +12,11 @@
         MouseDown="Window_MouseDown" MouseUp="Window_MouseUp"
         ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="image" Margin="2" Source="/micMuted.png" Opacity="0.70"/>
-        <tb:TaskbarIcon x:Name="myNotifyIcon"
+        <Image x:Name="image" Margin="2" Source="/Images/micMuted.png" Opacity="0.70"/>
+        <tb:TaskbarIcon x:Name="NotifyIcon"
                     Visibility="Visible"
                     ToolTipText="Mute Warning"
-                    IconSource="micMuted.ico"
+                    IconSource="Images/micMutedWhite.ico"
                     MenuActivation="LeftOrRightClick"
                     PopupActivation="DoubleClick">
             <tb:TaskbarIcon.ContextMenu>
