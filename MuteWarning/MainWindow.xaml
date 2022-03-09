@@ -12,7 +12,7 @@
         MouseDown="Window_MouseDown" MouseUp="Window_MouseUp"
         ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="image" Margin="2" Source="/Images/micMuted.png" Opacity="0.70"/>
+        <Image x:Name="image" Margin="2" Source="/Images/micMutedWhite.png" Opacity="0.7"/>
         <tb:TaskbarIcon x:Name="NotifyIcon"
                     Visibility="Visible"
                     ToolTipText="Mute Warning"

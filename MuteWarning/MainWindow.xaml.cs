@@ -1,10 +1,10 @@
-﻿using OBSWebsocketDotNet;
+﻿using FluentScheduler;
+using OBSWebsocketDotNet;
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace MuteWarning
 {
@@ -13,16 +13,20 @@ namespace MuteWarning
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly object _connectionLock = new();
         private SettingsWindow _settings;
 
+        private bool IsAutoConnectActive { get; set; }
+        private int? AutoConnectTimer { get; }
+        private OBSWebsocket OBS { get; }
         private AudioSourcesControl SourcesControl { get; }
         private SettingsWindow SettingsWindow => _settings ??= new SettingsWindow();
-        private OBSWebsocket OBS { get; }
 
         public MainWindow()
         {
             InitializeComponent();
 
+            AutoConnectTimer = 5;
             OBS = new OBSWebsocket();
             SourcesControl = new AudioSourcesControl(OnSourceUpdated);
 
@@ -45,11 +49,34 @@ namespace MuteWarning
             {
                 WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
+            
+            StartAutoConnect(AutoConnectTimer, true);
+        }
 
-            RunOnBackground(() =>
+        private void StartAutoConnect(int? timeInterval, bool runNow = false)
+        {
+            if (IsAutoConnectActive)
             {
-                Connect(false);
-            });
+                return;
+            }
+
+            if (!timeInterval.HasValue || timeInterval.Value < 1)
+            {
+                return;
+            }
+
+            IsAutoConnectActive = true;
+            JobManager.AddJob(
+                () => Connect(false),
+                s => (runNow ? s.ToRunNow().AndEvery(timeInterval.Value) : s.ToRunEvery(timeInterval.Value)).Minutes()
+            );
+        }
+
+        private void StopAutoConnect()
+        {
+            IsAutoConnectActive = false;
+            JobManager.Stop();
+            JobManager.RemoveAllJobs();
         }
 
         private void Disconnected(object sender, EventArgs e)
@@ -79,13 +106,13 @@ namespace MuteWarning
             {
                 if (Configuration.Settings.IsIconLocked)
                 {
-                    ChangeWindowStyles(WindowStylesOperations.Set,
+                    WindowHelper.ChangeWindowStyles(this, WindowHelper.WindowStylesOperations.Set,
                         WindowHelper.ExtendedWindowStyles.WS_EX_TOOLWINDOW,
                         WindowHelper.ExtendedWindowStyles.WS_EX_TRANSPARENT);
                 }
                 else
                 {
-                    ChangeWindowStyles(WindowStylesOperations.Set,
+                    WindowHelper.ChangeWindowStyles(this, WindowHelper.WindowStylesOperations.Set,
                         WindowHelper.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
                 }
             }
@@ -99,8 +126,8 @@ namespace MuteWarning
         {
             try
             {
-                var operation = Configuration.Settings.IsIconLocked ? WindowStylesOperations.Remove : WindowStylesOperations.Set;
-                ChangeWindowStyles(operation, WindowHelper.ExtendedWindowStyles.WS_EX_TRANSPARENT);
+                var operation = Configuration.Settings.IsIconLocked ? WindowHelper.WindowStylesOperations.Remove : WindowHelper.WindowStylesOperations.Set;
+                WindowHelper.ChangeWindowStyles(this, operation, WindowHelper.ExtendedWindowStyles.WS_EX_TRANSPARENT);
                 Configuration.Settings.IsIconLocked = !Configuration.Settings.IsIconLocked;
             }
             finally
@@ -163,80 +190,89 @@ namespace MuteWarning
 
         private void Connect(bool showMessages = true)
         {
-            try
+            lock (_connectionLock)
             {
-                if (IsConnected)
+                try
                 {
-                    return;
-                }
+                    if (IsConnected)
+                    {
+                        return;
+                    }
 
-                if (string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketUrl) || string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketPassword))
-                {
-                    throw new Exception("Connection failed");
-                }
+                    if (string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketUrl) || string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketPassword))
+                    {
+                        throw new Exception("Connection failed");
+                    }
 
-                OBS.Connect(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);
+                    OBS.Connect(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);
 
-                if (!IsConnected)
-                {
-                    throw new Exception("Connection failed");
-                }
+                    if (!IsConnected)
+                    {
+                        throw new Exception("Connection failed");
+                    }
 
-                SourcesControl.SetSources(
-                    OBS.GetSourcesList()
-                        .Where(si => "input".Equals(si.Type) && ("wasapi_output_capture".Equals(si.TypeID) || "wasapi_input_capture".Equals(si.TypeID)))
-                        .Select(si => new AudioSource(si.Name, OBS.GetMute(si.Name)))
-                        .ToArray()
-                );
-            }
-            catch (AuthFailureException)
-            {
-                if (showMessages)
-                {
-                    MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    StopAutoConnect();
+                    SourcesControl.SetSources(
+                        OBS.GetSourcesList()
+                            .Where(si => "input".Equals(si.Type) && ("wasapi_output_capture".Equals(si.TypeID) || "wasapi_input_capture".Equals(si.TypeID)))
+                            .Select(si => new AudioSource(si.Name, OBS.GetMute(si.Name)))
+                            .ToArray()
+                    );
                 }
-            }
-            catch (Exception ex)
-            {
-                if (showMessages)
+                catch (AuthFailureException)
                 {
-                    MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    if (showMessages)
+                    {
+                        MessageBox.Show("Authentication failed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
-            }
-            finally
-            {
-                CheckConnectionButtons();
+                catch (Exception ex)
+                {
+                    if (showMessages)
+                    {
+                        MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                finally
+                {
+                    CheckConnectionButtons();
+                }
             }
         }
 
         private void Disconnect(bool showMessages = true)
         {
-            try
+            lock (_connectionLock)
             {
-                if (!IsConnected)
+                try
                 {
-                    return;
+                    if (!IsConnected)
+                    {
+                        SourcesControl.ClearSources();
+                        return;
+                    }
+
+                    OBS.Disconnect();
+
+                    if (IsConnected)
+                    {
+                        throw new Exception("Disconnection failed");
+                    }
+
+                    SourcesControl.ClearSources();
                 }
-
-                OBS.Disconnect();
-
-                if (IsConnected)
+                catch (Exception ex)
                 {
-                    throw new Exception("Disconnection failed");
+                    if (showMessages)
+                    {
+                        MessageBox.Show($"Disconnect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
-
-                SourcesControl.ClearSources();
-            }
-            catch (Exception ex)
-            {
-                if (showMessages)
+                finally
                 {
-                    MessageBox.Show($"Disconnect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    CheckConnectionButtons();
+                    StartAutoConnect(AutoConnectTimer);
                 }
-            }
-            finally
-            {
-                CheckConnectionButtons();
             }
         }
 
@@ -285,40 +321,5 @@ namespace MuteWarning
         {
             Exit();
         }
-
-        #region Window styles
-
-        public enum WindowStylesOperations
-        {
-            Set,
-            Remove
-        }
-
-        private void ChangeWindowStyles(WindowStylesOperations operation, params WindowHelper.ExtendedWindowStyles[] styles)
-        {
-            if (styles?.Any() != true)
-            {
-                return;
-            }
-
-            WindowInteropHelper wndHelper = new WindowInteropHelper(this);
-            int exStyle = (int) WindowHelper.GetWindowLong(wndHelper.Handle, (int) WindowHelper.GetWindowLongFields.GWL_EXSTYLE);
-
-            foreach (var style in styles)
-            {
-                if (WindowStylesOperations.Set == operation)
-                {
-                    exStyle |= (int) style;
-                }
-                else
-                {
-                    exStyle &= ~(int) style;
-                }
-            }
-
-            WindowHelper.SetWindowLong(wndHelper.Handle, (int) WindowHelper.GetWindowLongFields.GWL_EXSTYLE, (IntPtr) exStyle);
-        }
-
-        #endregion
     }
 }

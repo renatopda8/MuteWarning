@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Interop;
 
 namespace MuteWarning
@@ -69,5 +70,35 @@ namespace MuteWarning
         [DllImport("kernel32.dll", EntryPoint = "SetLastError")]
         public static extern void SetLastError(int dwErrorCode);
 
+        public enum WindowStylesOperations
+        {
+            Set,
+            Remove
+        }
+
+        public static void ChangeWindowStyles(Window window, WindowStylesOperations operation, params ExtendedWindowStyles[] styles)
+        {
+            if (styles?.Any() != true)
+            {
+                return;
+            }
+
+            WindowInteropHelper wndHelper = new WindowInteropHelper(window);
+            int exStyle = (int) GetWindowLong(wndHelper.Handle, (int) GetWindowLongFields.GWL_EXSTYLE);
+
+            foreach (var style in styles)
+            {
+                if (WindowStylesOperations.Set == operation)
+                {
+                    exStyle |= (int) style;
+                }
+                else
+                {
+                    exStyle &= ~(int) style;
+                }
+            }
+
+            SetWindowLong(wndHelper.Handle, (int) GetWindowLongFields.GWL_EXSTYLE, (IntPtr) exStyle);
+        }
     }
 }

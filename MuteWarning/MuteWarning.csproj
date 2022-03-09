@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentScheduler" Version="5.5.1" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="obs-websocket-dotnet" Version="4.9.1" />
@@ -19,10 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Images\micMuted.ico"/>
-    <Resource Include="Images\micMuted.png"/>
-    <Resource Include="Images\micMutedWhite.ico"/>
-    <Resource Include="Images\micMutedWhite.png"/>
+    <Resource Include="Images\micMuted.ico" />
+    <Resource Include="Images\micMuted.png" />
+    <Resource Include="Images\micMutedWhite.ico" />
+    <Resource Include="Images\micMutedWhite.png" />
   </ItemGroup>
   
 </Project>

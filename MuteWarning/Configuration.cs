@@ -86,11 +86,7 @@ namespace MuteWarning
         public Point? IconPosition
         {
             get { return _iconPosition; }
-            set
-            {
-                _iconPosition = value;
-                OnPropertyChanged();
-            }
+            set { _iconPosition = value; }
         }
 
         /// <summary>
@@ -99,11 +95,7 @@ namespace MuteWarning
         public bool IsIconLocked
         {
             get { return _isIconLocked; }
-            set
-            {
-                _isIconLocked = value;
-                OnPropertyChanged();
-            }
+            set { _isIconLocked = value; }
         }
 
         #region INotifyPropertyChanged
