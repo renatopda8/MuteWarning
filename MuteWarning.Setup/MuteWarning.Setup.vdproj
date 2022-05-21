@@ -50,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -183,7 +191,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:MuteWarning"
         "ProductCode" = "8:{2118AD63-661E-4B67-AF5E-AE0A5636934F}"
-        "PackageCode" = "8:{804DCA87-FA1C-44CB-9F5E-45AA0DE96A2E}"
+        "PackageCode" = "8:{29490BA6-8AEA-4B21-9039-B0343FDFF7DF}"
         "UpgradeCode" = "8:{7CB5E881-AC26-4AAA-82F2-0B51EB456E48}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -200,7 +208,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPPRODUCTICON" = "8:_8170FCEAC685469EA43FB1BEDF63A543"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
