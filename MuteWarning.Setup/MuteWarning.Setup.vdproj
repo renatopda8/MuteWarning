@@ -43,6 +43,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +67,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -166,15 +182,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:MuteWarning"
-        "ProductCode" = "8:{F49C9CD9-DEBE-49D4-A900-C0FF80E148C7}"
-        "PackageCode" = "8:{77F7CBD7-38CC-42EA-BD09-FAC637123CBF}"
+        "ProductCode" = "8:{2118AD63-661E-4B67-AF5E-AE0A5636934F}"
+        "PackageCode" = "8:{804DCA87-FA1C-44CB-9F5E-45AA0DE96A2E}"
         "UpgradeCode" = "8:{7CB5E881-AC26-4AAA-82F2-0B51EB456E48}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.1"
+        "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:Renato Albuquerque"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
