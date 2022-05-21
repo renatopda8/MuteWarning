@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "MuteWarning.Setup", "MuteWarning.Setup\MuteWarning.Setup.vdproj", "{E29C1778-50A4-4551-8F9A-316D998DA415}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,8 @@ Global
 		{94655217-6824-40BB-9857-DD4DB5AF707A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94655217-6824-40BB-9857-DD4DB5AF707A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94655217-6824-40BB-9857-DD4DB5AF707A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E29C1778-50A4-4551-8F9A-316D998DA415}.Debug|Any CPU.ActiveCfg = Debug
+		{E29C1778-50A4-4551-8F9A-316D998DA415}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
