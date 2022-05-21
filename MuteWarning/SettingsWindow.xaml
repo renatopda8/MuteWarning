@@ -78,9 +78,9 @@
             </Grid>
         </Grid>
         <!--Close Buttons-->
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="68,0,0,0" VerticalAlignment="Center" FontSize="18" Width="116"
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="68,18,0,0" VerticalAlignment="Top" FontSize="18" Width="116"
                 Background="#FF2D611F" FontWeight="Bold" Foreground="White" BorderBrush="Black" Height="40" Click="SaveButton_Click" Grid.Row="4"/>
-        <Button x:Name="CancelButton" Content="Cancel" Margin="216,0,0,0" VerticalAlignment="Center" FontSize="18" Foreground="White" BorderBrush="Black"
+        <Button x:Name="CancelButton" Content="Cancel" Margin="216,18,0,0" VerticalAlignment="Top" FontSize="18" Foreground="White" BorderBrush="Black"
                 Background="#FF5F1616" FontWeight="Bold" Height="40" Click="CancelButton_Click" HorizontalAlignment="Left" Width="116" Grid.Row="4"/>
     </Grid>
 </Window>
