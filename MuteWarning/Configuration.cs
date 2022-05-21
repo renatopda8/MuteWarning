@@ -21,10 +21,12 @@ namespace MuteWarning
 
         private static string _appDataPath;
         private static string _settingsFilePath;
-        private const string _iconImageDefaultPath = "/Images/micMutedWhite.png";
 
         private static string AppDataPath => _appDataPath ??= Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(MuteWarning));
         private static string SettingsFilePath => _settingsFilePath ??= Path.Combine(AppDataPath, $"{nameof(Settings)}.json");
+
+        public static string IconImageBlackPath => "/Images/micMuted.png";
+        public static string IconImageWhitePath => "/Images/micMutedWhite.png";
 
         static Configuration()
         {
@@ -37,7 +39,7 @@ namespace MuteWarning
             {
                 _settings = new Configuration
                 {
-                    IconImagePath = _iconImageDefaultPath,
+                    IconImagePath = IconImageBlackPath,
                     IsAutoConnectActive = true,
                     AutoConnectIntervalInMinutes = 5
                 };
@@ -51,7 +53,7 @@ namespace MuteWarning
 
             if (string.IsNullOrWhiteSpace(_settings.IconImagePath))
             {
-                _settings.IconImagePath = _iconImageDefaultPath;
+                _settings.IconImagePath = IconImageBlackPath;
             }
         }
 

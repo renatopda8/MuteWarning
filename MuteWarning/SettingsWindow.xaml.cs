@@ -11,11 +11,8 @@ namespace MuteWarning
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        public string IconImageBlackPath => "/Images/micMuted.png";
-        public string IconImageWhitePath => "/Images/micMutedWhite.png";
-
-        public bool IsIconImageBlackActive => IconImageBlackPath.Equals(Configuration.Settings.IconImagePath);
-        public bool IsIconImageWhiteActive => IconImageWhitePath.Equals(Configuration.Settings.IconImagePath);
+        protected bool IsIconImageBlackActive => Configuration.IconImageBlackPath.Equals(Configuration.Settings.IconImagePath);
+        protected bool IsIconImageWhiteActive => Configuration.IconImageWhitePath.Equals(Configuration.Settings.IconImagePath);
 
         public SettingsWindow()
         {
@@ -41,7 +38,7 @@ namespace MuteWarning
         {
             Configuration.Settings.ObsSocketUrl = ObsSocketUrlTextBox.Text?.Trim();
             Configuration.Settings.ObsSocketPassword = ObsSocketPasswordTextBox.Text?.Trim();
-            Configuration.Settings.IconImagePath = IconImageWhiteRadioButton?.IsChecked ?? false ? IconImageWhitePath : IconImageBlackPath;
+            Configuration.Settings.IconImagePath = IconImageWhiteRadioButton?.IsChecked ?? false ? Configuration.IconImageWhitePath : Configuration.IconImageBlackPath;
             Configuration.Settings.IsAutoConnectActive = IsAutoConnectActiveCheckBox.IsChecked ?? false;
             Configuration.Settings.AutoConnectIntervalInMinutes = int.TryParse(AutoConnectIntervalInMinutesTextBox.Text, out int result) ? result : 0;
 
@@ -67,7 +64,7 @@ namespace MuteWarning
         {
             ObsSocketUrlTextBox.Text = Configuration.Settings.ObsSocketUrl;
             ObsSocketPasswordTextBox.Text = Configuration.Settings.ObsSocketPassword;
-            IconImageWhiteRadioButton.IsChecked = !(IconImageBlackRadioButton.IsChecked = IconImageBlackPath.Equals(Configuration.Settings.IconImagePath));
+            IconImageWhiteRadioButton.IsChecked = !(IconImageBlackRadioButton.IsChecked = Configuration.IconImageBlackPath.Equals(Configuration.Settings.IconImagePath));
             IsAutoConnectActiveCheckBox.IsChecked = Configuration.Settings.IsAutoConnectActive;
             AutoConnectIntervalInMinutesTextBox.Text = Configuration.Settings.AutoConnectIntervalInMinutes?.ToString();
             ResetIconPositionCheckBox.IsChecked = false;

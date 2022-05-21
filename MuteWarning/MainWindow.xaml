@@ -9,8 +9,6 @@
         Title="MuteWarning" Height="100" Width="100"
         AllowsTransparency="True" WindowStyle="None"
         ShowInTaskbar="False" Topmost="True" Background="Transparent"
-        Left="{Binding Source={x:Static local:Configuration.Settings}, Path=IconPosition.Value.X, Mode=OneTime}"
-        Top="{Binding Source={x:Static local:Configuration.Settings}, Path=IconPosition.Value.Y, Mode=OneTime}"
         MouseDown="Window_MouseDown" MouseUp="Window_MouseUp"
         ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
