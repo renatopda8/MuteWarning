@@ -51,7 +51,7 @@
                 </Grid.RowDefinitions>
                 <RadioButton x:Name="IconImageBlackRadioButton" HorizontalAlignment="Left" Margin="35,10,0,10" VerticalAlignment="Top" Grid.Row="0"
                              IsChecked="{Binding IsIconImageBlackActive, Mode=OneWay}">
-                    <Image x:Name="ImageBlack" Margin="2" Source="{Binding IconImageBlackPath}">
+                    <Image x:Name="ImageBlack" Margin="2" Source="{Binding Source={x:Static local:Configuration.IconImageBlackPath}, Mode=OneTime}">
                         <Image.Effect>
                             <DropShadowEffect Direction="100" Color="White" ShadowDepth="0.5" BlurRadius="8" />
                         </Image.Effect>
@@ -59,7 +59,7 @@
                 </RadioButton>
                 <RadioButton x:Name="IconImageWhiteRadioButton" HorizontalAlignment="Left" Margin="35,10,0,10" VerticalAlignment="Top" Grid.Row="1"
                              IsChecked="{Binding IsIconImageWhiteActive, Mode=OneWay}">
-                    <Image x:Name="ImageWhite" Margin="2" Source="{Binding IconImageWhitePath}"/>
+                    <Image x:Name="ImageWhite" Margin="2" Source="{Binding Source={x:Static local:Configuration.IconImageWhitePath}, Mode=OneTime}"/>
                 </RadioButton>
             </Grid>
             <Grid Grid.Column="1">
