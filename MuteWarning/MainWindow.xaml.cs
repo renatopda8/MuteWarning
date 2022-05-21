@@ -16,8 +16,6 @@ namespace MuteWarning
         private readonly object _connectionLock = new();
         private SettingsWindow _settings;
 
-        private bool IsAutoConnectActive { get; set; }
-        private int? AutoConnectTimer { get; }
         private OBSWebsocket OBS { get; }
         private AudioSourcesControl SourcesControl { get; }
         private SettingsWindow SettingsWindow => _settings ??= new SettingsWindow();
@@ -26,7 +24,6 @@ namespace MuteWarning
         {
             InitializeComponent();
 
-            AutoConnectTimer = 5;
             OBS = new OBSWebsocket();
             SourcesControl = new AudioSourcesControl(OnSourceUpdated);
 
@@ -50,31 +47,50 @@ namespace MuteWarning
                 WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
             
-            StartAutoConnect(AutoConnectTimer, true);
+            StartAutoConnect(true);
         }
 
-        private void StartAutoConnect(int? timeInterval, bool runNow = false)
+        private void StartAutoConnect(bool runNow = false)
         {
-            if (IsAutoConnectActive)
+            if (!Configuration.Settings.IsAutoConnectActive || IsConnected)
             {
                 return;
             }
 
-            if (!timeInterval.HasValue || timeInterval.Value < 1)
+            //Auto connect já agendado
+            if (JobManager.AllSchedules.Any())
             {
                 return;
             }
 
-            IsAutoConnectActive = true;
+            var intervalInMinutes = Configuration.Settings.AutoConnectIntervalInMinutes;
+            if (!intervalInMinutes.HasValue || intervalInMinutes.Value < 1)
+            {
+                return;
+            }
+
+            TimeUnit runFunction(Schedule s, int m) =>
+                runNow ? s.ToRunNow().AndEvery(m) : s.ToRunEvery(m);
+
             JobManager.AddJob(
                 () => Connect(false),
-                s => (runNow ? s.ToRunNow().AndEvery(timeInterval.Value) : s.ToRunEvery(timeInterval.Value)).Minutes()
+                s => runFunction(s.NonReentrant(), intervalInMinutes.Value).Seconds()
             );
         }
 
         private void StopAutoConnect()
         {
-            IsAutoConnectActive = false;
+            if (!Configuration.Settings.IsAutoConnectActive)
+            {
+                return;
+            }
+
+            //Auto connect não agendado
+            if (!JobManager.AllSchedules.Any())
+            {
+                return;
+            }
+
             JobManager.Stop();
             JobManager.RemoveAllJobs();
         }
@@ -271,7 +287,7 @@ namespace MuteWarning
                 finally
                 {
                     CheckConnectionButtons();
-                    StartAutoConnect(AutoConnectTimer);
+                    StartAutoConnect();
                 }
             }
         }

@@ -14,10 +14,14 @@ namespace MuteWarning
         private string _obsSocketUrl;
         private string _obsSocketPassword;
         private Point? _iconPosition;
+        private string _iconImagePath;
         private bool _isIconLocked;
+        private bool _isAutoConnectActive;
+        private int? _autoConnectIntervalInMinutes;
 
         private static string _appDataPath;
         private static string _settingsFilePath;
+        private const string _iconImageDefaultPath = "/Images/micMutedWhite.png";
 
         private static string AppDataPath => _appDataPath ??= Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(MuteWarning));
         private static string SettingsFilePath => _settingsFilePath ??= Path.Combine(AppDataPath, $"{nameof(Settings)}.json");
@@ -31,7 +35,12 @@ namespace MuteWarning
 
             if (!File.Exists(SettingsFilePath))
             {
-                _settings = new Configuration();
+                _settings = new Configuration
+                {
+                    IconImagePath = _iconImageDefaultPath,
+                    IsAutoConnectActive = true,
+                    AutoConnectIntervalInMinutes = 5
+                };
                 _settings.Save();
 
                 return;
@@ -39,6 +48,11 @@ namespace MuteWarning
 
             string settingsJson = File.ReadAllText(SettingsFilePath);
             _settings = JsonConvert.DeserializeObject<Configuration>(settingsJson);
+
+            if (string.IsNullOrWhiteSpace(_settings.IconImagePath))
+            {
+                _settings.IconImagePath = _iconImageDefaultPath;
+            }
         }
 
         public static Configuration Settings => _settings;
@@ -90,12 +104,43 @@ namespace MuteWarning
         }
 
         /// <summary>
+        /// Caminho do arquivo da imagem de aviso
+        /// </summary>
+        public string IconImagePath
+        {
+            get { return _iconImagePath; }
+            set
+            {
+                _iconImagePath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Define se o ícone está fixado na posição atual e permitindo cliques através da imagem
         /// </summary>
         public bool IsIconLocked
         {
             get { return _isIconLocked; }
             set { _isIconLocked = value; }
+        }
+
+        /// <summary>
+        /// Define se a função de conexão automática está ativa
+        /// </summary>
+        public bool IsAutoConnectActive
+        {
+            get { return _isAutoConnectActive; }
+            set { _isAutoConnectActive = value; }
+        }
+
+        /// <summary>
+        /// Define o intervalo em minutos para execução da tentativa de conexão automática com o OBS
+        /// </summary>
+        public int? AutoConnectIntervalInMinutes
+        {
+            get { return _autoConnectIntervalInMinutes; }
+            set { _autoConnectIntervalInMinutes = value; }
         }
 
         #region INotifyPropertyChanged

@@ -5,29 +5,82 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MuteWarning"
         mc:Ignorable="d"
-        Title="Settings" Height="300" Width="400" WindowStyle="None"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="Settings" Height="460" Width="400" WindowStyle="None"
         ResizeMode="NoResize" 
         AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
-        MouseDown="Window_MouseDown"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+        MouseDown="Window_MouseDown">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.80"/>
     </Window.Background>
     <Grid>
-        <Label x:Name="label" Content="Settings" Foreground="White" HorizontalAlignment="Center" HorizontalContentAlignment="Center"
-               Margin="0,10,0,0" VerticalAlignment="Top" Width="130" FontSize="20" FontWeight="Bold"/>
-        <TextBlock x:Name="ObsSocketUrlTextBlock" HorizontalAlignment="Left" Margin="30,60,0,0" TextWrapping="Wrap" Text="OBS Socket URL"
-                   Foreground="White" FontWeight="Bold" FontSize="16" Height="21" VerticalAlignment="Top"/>
-        <TextBox x:Name="ObsSocketUrlTextBox" Margin="30,86,30,0" TextWrapping="Wrap" Text="{Binding Settings.ObsSocketUrl, Mode=OneWay}"
-                 VerticalAlignment="Top" FontSize="16"/>
-        <TextBlock x:Name="ObsSocketPasswordTextBlock" HorizontalAlignment="Left" Margin="30,137,0,0" TextWrapping="Wrap" Text="OBS Socket Password"
-                   VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="16"/>
-        <TextBox x:Name="ObsSocketPasswordTextBox" Margin="30,163,30,0" TextWrapping="Wrap" Text="{Binding Settings.ObsSocketPassword, Mode=OneWay}"
-                 VerticalAlignment="Top" FontSize="16"/>
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="68,226,0,0" VerticalAlignment="Top" FontSize="18" Width="116"
-                Background="#FF2D611F" FontWeight="Bold" Foreground="White" BorderBrush="Black" Height="40" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton" Content="Cancel" Margin="216,226,0,0" VerticalAlignment="Top" FontSize="18" Foreground="White" BorderBrush="Black"
-                Background="#FF5F1616" FontWeight="Bold" Height="40" Click="CancelButton_Click" HorizontalAlignment="Left" Width="116"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="75"/>
+            <RowDefinition Height="75"/>
+            <RowDefinition/>
+            <RowDefinition Height="85"/>
+        </Grid.RowDefinitions>
+        <!--Title-->
+        <Label x:Name="label" Content="Settings" Foreground="White" HorizontalAlignment="Center"
+               Margin="0,5,0,5" FontSize="20" FontWeight="Bold" Grid.Row="0" Width="86"/>
+        <!--OBS Socket URL-->
+        <TextBlock x:Name="ObsSocketUrlTextBlock" HorizontalAlignment="Left" Margin="35,10,0,0" TextWrapping="Wrap" Text="OBS Socket URL"
+                   Foreground="White" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBox x:Name="ObsSocketUrlTextBox" Margin="35,35,35,0" TextWrapping="Wrap" Text="{Binding Source={x:Static local:Configuration.Settings}, Path=ObsSocketUrl, Mode=OneWay}"
+                 VerticalAlignment="Top" FontSize="16" Grid.Row="1" Height="24"/>
+        <!--OBS Socket Password-->
+        <TextBlock x:Name="ObsSocketPasswordTextBlock" HorizontalAlignment="Left" Margin="35,10,0,0" TextWrapping="Wrap" Text="OBS Socket Password"
+                   VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="16" Grid.Row="2"/>
+        <TextBox x:Name="ObsSocketPasswordTextBox" Margin="35,35,35,0" TextWrapping="Wrap" Text="{Binding Source={x:Static local:Configuration.Settings}, Path=ObsSocketPassword, Mode=OneWay}"
+                 VerticalAlignment="Top" FontSize="16" Grid.Row="2" Height="24"/>
+        <!--Icon Image-->
+        <Grid Grid.Row="3" Margin="0,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="15*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <RadioButton x:Name="IconImageBlackRadioButton" HorizontalAlignment="Left" Margin="35,10,0,10" VerticalAlignment="Top" Grid.Row="0"
+                             IsChecked="{Binding IsIconImageBlackActive, Mode=OneWay}">
+                    <Image x:Name="ImageBlack" Margin="2" Source="{Binding IconImageBlackPath}">
+                        <Image.Effect>
+                            <DropShadowEffect Direction="100" Color="White" ShadowDepth="0.5" BlurRadius="8" />
+                        </Image.Effect>
+                    </Image>
+                </RadioButton>
+                <RadioButton x:Name="IconImageWhiteRadioButton" HorizontalAlignment="Left" Margin="35,10,0,10" VerticalAlignment="Top" Grid.Row="1"
+                             IsChecked="{Binding IsIconImageWhiteActive, Mode=OneWay}">
+                    <Image x:Name="ImageWhite" Margin="2" Source="{Binding IconImageWhitePath}"/>
+                </RadioButton>
+            </Grid>
+            <Grid Grid.Column="1">
+                <!--Auto Connect Active-->
+                <CheckBox x:Name="IsAutoConnectActiveCheckBox" Content="Auto Connect to OBS" FontWeight="Bold" Foreground="White" Margin="25,18,35,0" VerticalAlignment="Top"
+                          IsChecked="{Binding Source={x:Static local:Configuration.Settings}, Path=IsAutoConnectActive, Mode=OneWay}"/>
+                <!--Auto Connect Time in Minutes-->
+                <TextBlock x:Name="AutoConnectIntervalInMinutesTextBlock" HorizontalAlignment="Left" Margin="25,48,0,0" TextWrapping="Wrap" Text="Interval (Minutes)"
+                   VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="12"/>
+                <TextBox x:Name="AutoConnectIntervalInMinutesTextBox" Margin="25,73,35,0" Height="22" VerticalAlignment="Top" FontSize="12"
+                         IsEnabled="{Binding ElementName=IsAutoConnectActiveCheckBox, Path=IsChecked, TargetNullValue=false}"
+                         Text="{Binding Source={x:Static local:Configuration.Settings}, Path=AutoConnectIntervalInMinutes, Mode=OneWay}"
+                         PreviewTextInput="AutoConnectIntervalInMinutesTextBox_PreviewTextInput" TextChanged="AutoConnectIntervalInMinutesTextBox_TextChanged"/>
+                <!--Reset Icon Position-->
+                <CheckBox x:Name="ResetIconPositionCheckBox" Content="Reset Icon Position" FontWeight="Bold" Foreground="White" Margin="25,125,35,0" VerticalAlignment="Top"/>
+            </Grid>
+        </Grid>
+        <!--Close Buttons-->
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="68,0,0,0" VerticalAlignment="Center" FontSize="18" Width="116"
+                Background="#FF2D611F" FontWeight="Bold" Foreground="White" BorderBrush="Black" Height="40" Click="SaveButton_Click" Grid.Row="4"/>
+        <Button x:Name="CancelButton" Content="Cancel" Margin="216,0,0,0" VerticalAlignment="Center" FontSize="18" Foreground="White" BorderBrush="Black"
+                Background="#FF5F1616" FontWeight="Bold" Height="40" Click="CancelButton_Click" HorizontalAlignment="Left" Width="116" Grid.Row="4"/>
     </Grid>
 </Window>

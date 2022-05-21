@@ -9,10 +9,12 @@
         Title="MuteWarning" Height="100" Width="100"
         AllowsTransparency="True" WindowStyle="None"
         ShowInTaskbar="False" Topmost="True" Background="Transparent"
+        Left="{Binding Source={x:Static local:Configuration.Settings}, Path=IconPosition.Value.X, Mode=OneTime}"
+        Top="{Binding Source={x:Static local:Configuration.Settings}, Path=IconPosition.Value.Y, Mode=OneTime}"
         MouseDown="Window_MouseDown" MouseUp="Window_MouseUp"
         ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="image" Margin="2" Source="/Images/micMutedWhite.png" Opacity="0.7"/>
+        <Image x:Name="image" Margin="2" Source="{Binding Source={x:Static local:Configuration.Settings}, Path=IconImagePath}" Opacity="0.7"/>
         <tb:TaskbarIcon x:Name="NotifyIcon"
                     Visibility="Visible"
                     ToolTipText="Mute Warning"
