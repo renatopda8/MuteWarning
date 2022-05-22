@@ -1,5 +1,5 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -49,8 +49,7 @@ namespace MuteWarning
             }
 
             using var startupApprovedKey = Registry.CurrentUser.OpenSubKey(_startupApprovedRegistryKey, true);
-            byte[] binaryValue = startupApprovedKey.GetValue(nameof(MuteWarning)) as byte[];
-            StartWithWindow = binaryValue == null || binaryValue[0] == 2;
+            StartWithWindow = startupApprovedKey.GetValue(nameof(MuteWarning)) is not byte[] binaryValue || binaryValue[0] == 2;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -101,11 +100,10 @@ namespace MuteWarning
                 if (StartWithWindowsCheckBox.IsChecked == true)
                 {
                     Assembly curAssembly = Assembly.GetExecutingAssembly();
-                    string location = curAssembly.Location;
+                    string location = Path.ChangeExtension(curAssembly.Location, "exe");
                     startupKey.SetValue(nameof(MuteWarning), location);
 
-                    byte[] binaryValue = startupApprovedKey.GetValue(nameof(MuteWarning)) as byte[];
-                    if (binaryValue != null && binaryValue[0] != 2)
+                    if (startupApprovedKey.GetValue(nameof(MuteWarning)) is byte[] binaryValue && binaryValue[0] != 2)
                     {
                         binaryValue[0] = 2;
                         startupApprovedKey.SetValue(nameof(MuteWarning), binaryValue);
