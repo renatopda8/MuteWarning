@@ -69,12 +69,15 @@
                 <!--Auto Connect Time in Minutes-->
                 <TextBlock x:Name="AutoConnectIntervalInMinutesTextBlock" HorizontalAlignment="Left" Margin="25,48,0,0" TextWrapping="Wrap" Text="Interval (Minutes)"
                    VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="12"/>
-                <TextBox x:Name="AutoConnectIntervalInMinutesTextBox" Margin="25,73,35,0" Height="22" VerticalAlignment="Top" FontSize="12"
+                <TextBox x:Name="AutoConnectIntervalInMinutesTextBox" Margin="25,73,150,0" Height="22" VerticalAlignment="Top" FontSize="12" MaxLength="3" VerticalContentAlignment="Center" Padding="3,0"
                          IsEnabled="{Binding ElementName=IsAutoConnectActiveCheckBox, Path=IsChecked, TargetNullValue=false}"
                          Text="{Binding Source={x:Static local:Configuration.Settings}, Path=AutoConnectIntervalInMinutes, Mode=OneWay}"
                          PreviewTextInput="AutoConnectIntervalInMinutesTextBox_PreviewTextInput" TextChanged="AutoConnectIntervalInMinutesTextBox_TextChanged"/>
+                <!--Start with Windows-->
+                <CheckBox x:Name="StartWithWindowsCheckBox" Content="Start with Windows" FontWeight="Bold" Foreground="White" Margin="25,118,35,0" VerticalAlignment="Top"
+                          IsChecked="{Binding StartWithWindow, Mode=OneWay}"/>
                 <!--Reset Icon Position-->
-                <CheckBox x:Name="ResetIconPositionCheckBox" Content="Reset Icon Position" FontWeight="Bold" Foreground="White" Margin="25,125,35,0" VerticalAlignment="Top"/>
+                <CheckBox x:Name="ResetIconPositionCheckBox" Content="Reset Icon Position" FontWeight="Bold" Foreground="White" Margin="25,145,35,0" VerticalAlignment="Top"/>
             </Grid>
         </Grid>
         <!--Close Buttons-->
