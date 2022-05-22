@@ -11,8 +11,9 @@ namespace MuteWarning
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        protected bool IsIconImageBlackActive => Configuration.IconImageBlackPath.Equals(Configuration.Settings.IconImagePath);
-        protected bool IsIconImageWhiteActive => Configuration.IconImageWhitePath.Equals(Configuration.Settings.IconImagePath);
+        public bool IsIconImageBlackActive => Configuration.IconImageBlackPath.Equals(Configuration.Settings.IconImagePath);
+
+        public bool IsIconImageWhiteActive => Configuration.IconImageWhitePath.Equals(Configuration.Settings.IconImagePath);
 
         public SettingsWindow()
         {
