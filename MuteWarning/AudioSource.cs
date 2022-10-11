@@ -2,15 +2,15 @@
 
 namespace MuteWarning
 {
-    public class AudioSource
+    public class AudioInput
     {
-        public AudioSource(string sourceName, bool isMuted)
+        public AudioInput(string inputName, bool isMuted)
         {
-            SourceName = sourceName ?? throw new ArgumentNullException(nameof(sourceName));
+            InputName = inputName ?? throw new ArgumentNullException(nameof(inputName));
             IsMuted = isMuted;
         }
 
-        public string SourceName { get; set; }
+        public string InputName { get; set; }
         public bool IsMuted { get; set; }
     }
 }
