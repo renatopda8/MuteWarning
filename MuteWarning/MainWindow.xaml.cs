@@ -1,5 +1,7 @@
 ﻿using FluentScheduler;
 using OBSWebsocketDotNet;
+using OBSWebsocketDotNet.Communication;
+using OBSWebsocketDotNet.Types.Events;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace MuteWarning
         private SettingsWindow _settings;
 
         private OBSWebsocket OBS { get; }
-        private AudioSourcesControl SourcesControl { get; }
+        private AudioInputControl InputsControl { get; }
         private SettingsWindow SettingsWindow => _settings ??= new SettingsWindow();
 
         public MainWindow()
@@ -25,7 +27,7 @@ namespace MuteWarning
             InitializeComponent();
 
             OBS = new OBSWebsocket();
-            SourcesControl = new AudioSourcesControl(OnSourceUpdated);
+            InputsControl = new AudioInputControl(OnInputUpdated);
 
             Initialize();
         }
@@ -34,8 +36,9 @@ namespace MuteWarning
         {
             SetVisible(false);
 
-            OBS.SourceMuteStateChanged += SourceMuteStateChanged;
+            OBS.InputMuteStateChanged += InputMuteStateChanged;
             OBS.Disconnected += Disconnected;
+            OBS.Connected += Connected;
 
             if (Configuration.Settings.IconPosition.HasValue)
             {
@@ -74,7 +77,7 @@ namespace MuteWarning
 
             JobManager.AddJob(
                 () => Connect(false),
-                s => runFunction(s.NonReentrant(), intervalInMinutes.Value).Seconds()
+                s => runFunction(s.NonReentrant(), intervalInMinutes.Value).Minutes()
             );
         }
 
@@ -95,7 +98,33 @@ namespace MuteWarning
             JobManager.RemoveAllJobs();
         }
 
-        private void Disconnected(object sender, EventArgs e)
+        private void Connected(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!OBS.IsConnected)
+                {
+                    throw new Exception("Connection failed");
+                }
+
+                StopAutoConnect();
+
+                AudioInput[] audioInputs = OBS.GetInputList()
+                    .Where(input => "wasapi_output_capture".Equals(input.InputKind)
+                        || "wasapi_input_capture".Equals(input.InputKind)
+                        || "wasapi_process_output_capture".Equals(input.InputKind))
+                    .Select(input => new AudioInput(input.InputName, OBS.GetInputMute(input.InputName)))
+                    .ToArray();
+
+                InputsControl.SetInputs(audioInputs);
+            }
+            finally
+            {
+                CheckConnectionButtons();
+            }
+        }
+
+        private void Disconnected(object sender, ObsDisconnectionInfo e)
         {
             Disconnect(false);
         }
@@ -152,9 +181,9 @@ namespace MuteWarning
             }
         }
 
-        private void SourceMuteStateChanged(OBSWebsocket sender, string sourceName, bool muted)
+        private void InputMuteStateChanged(object sender, InputMuteStateChangedEventArgs e)
         {
-            SourcesControl.UpdateSource(sourceName, muted);
+            InputsControl.UpdateInput(e.InputName, e.InputMuted);
         }
 
         private void SetVisible(bool isVisible)
@@ -199,9 +228,9 @@ namespace MuteWarning
             });
         }
 
-        private void OnSourceUpdated(bool isAnySourceMuted)
+        private void OnInputUpdated(bool isAnyInputMuted)
         {
-            SetVisible(isAnySourceMuted);
+            SetVisible(isAnyInputMuted);
         }
 
         private void Connect(bool showMessages = true)
@@ -217,23 +246,10 @@ namespace MuteWarning
 
                     if (string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketUrl) || string.IsNullOrWhiteSpace(Configuration.Settings.ObsSocketPassword))
                     {
-                        throw new Exception("Connection failed");
+                        throw new Exception("OBS Socket URL or password not provided");
                     }
 
-                    OBS.Connect(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);
-
-                    if (!IsConnected)
-                    {
-                        throw new Exception("Connection failed");
-                    }
-
-                    StopAutoConnect();
-                    SourcesControl.SetSources(
-                        OBS.GetSourcesList()
-                            .Where(si => "input".Equals(si.Type) && ("wasapi_output_capture".Equals(si.TypeID) || "wasapi_input_capture".Equals(si.TypeID)))
-                            .Select(si => new AudioSource(si.Name, OBS.GetMute(si.Name)))
-                            .ToArray()
-                    );
+                    OBS.ConnectAsync(Configuration.Settings.ObsSocketUrl, Configuration.Settings.ObsSocketPassword);
                 }
                 catch (AuthFailureException)
                 {
@@ -249,10 +265,6 @@ namespace MuteWarning
                         MessageBox.Show($"Connect failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
-                finally
-                {
-                    CheckConnectionButtons();
-                }
             }
         }
 
@@ -264,7 +276,7 @@ namespace MuteWarning
                 {
                     if (!IsConnected)
                     {
-                        SourcesControl.ClearSources();
+                        InputsControl.ClearInputs();
                         return;
                     }
 
@@ -275,7 +287,7 @@ namespace MuteWarning
                         throw new Exception("Disconnection failed");
                     }
 
-                    SourcesControl.ClearSources();
+                    InputsControl.ClearInputs();
                 }
                 catch (Exception ex)
                 {

@@ -4,58 +4,58 @@ using System.Linq;
 
 namespace MuteWarning
 {
-    public class AudioSourcesControl
+    public class AudioInputControl
     {
-        public Action<bool> OnSourceUpdated { get; }
-        private List<AudioSource> AudioSources { get; }
+        public Action<bool> OnInputUpdated { get; }
+        private List<AudioInput> AudioInputs { get; }
 
-        public AudioSourcesControl(Action<bool> onSourceUpdated)
+        public AudioInputControl(Action<bool> onInputUpdated)
         {
-            AudioSources = new List<AudioSource>();
-            OnSourceUpdated = onSourceUpdated;
+            AudioInputs = new List<AudioInput>();
+            OnInputUpdated = onInputUpdated;
         }
 
-        public void UpdateSource(string sourceName, bool isMuted)
+        public void UpdateInput(string inputName, bool isMuted)
         {
-            var source = AudioSources.SingleOrDefault(s => s.SourceName == sourceName);
-            if (source == null)
+            var input = AudioInputs.SingleOrDefault(s => s.InputName == inputName);
+            if (input == null)
             {
-                source = new AudioSource(sourceName, isMuted);
-                AudioSources.Add(source);
+                input = new AudioInput(inputName, isMuted);
+                AudioInputs.Add(input);
             }
             else
             {
-                source.IsMuted = isMuted;
+                input.IsMuted = isMuted;
             }
 
-            SourceUpdated();
+            InputUpdated();
         }
 
-        public void SetSources(params AudioSource[] audioSources)
+        public void SetInputs(params AudioInput[] audioInputs)
         {
-            AudioSources.Clear();
-            foreach (var source in audioSources)
+            AudioInputs.Clear();
+            foreach (var input in audioInputs)
             {
-                if (!AudioSources.Any(s => s.SourceName == source.SourceName))
+                if (!AudioInputs.Any(s => s.InputName == input.InputName))
                 {
-                    AudioSources.Add(source);
+                    AudioInputs.Add(input);
                 }
             }
 
-            SourceUpdated();
+            InputUpdated();
         }
 
-        public void ClearSources()
+        public void ClearInputs()
         {
-            //Nenhuma audio source para incluir, apenas limpa e dispara o update
-            SetSources();
+            //Nenhum audio input para incluir, apenas limpa e dispara o update
+            SetInputs();
         }
 
-        private void SourceUpdated()
+        private void InputUpdated()
         {
-            OnSourceUpdated?.Invoke(IsAnySourceMuted);
+            OnInputUpdated?.Invoke(IsAnyInputMuted);
         }
 
-        private bool IsAnySourceMuted { get => AudioSources.Any(s => s.IsMuted); }
+        private bool IsAnyInputMuted { get => AudioInputs.Any(s => s.IsMuted); }
     }
 }
