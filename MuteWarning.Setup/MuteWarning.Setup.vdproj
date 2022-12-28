@@ -198,15 +198,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:MuteWarning"
-        "ProductCode" = "8:{0835896B-03D1-4B05-A044-A0E63FAE8B71}"
-        "PackageCode" = "8:{816E2747-B1F4-4247-8606-EE39D69D5222}"
+        "ProductCode" = "8:{9101BAC8-02C6-4700-8231-18BA5ADF790A}"
+        "PackageCode" = "8:{D6F3D326-2988-4235-8CC4-021D1AE85B4F}"
         "UpgradeCode" = "8:{7CB5E881-AC26-4AAA-82F2-0B51EB456E48}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.3"
+        "ProductVersion" = "8:1.0.4"
         "Manufacturer" = "8:Renato Albuquerque"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -734,7 +734,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FDA5C6241B9346649FD83199C0F31BF5"
             {
-            "SourcePath" = "8:..\\MuteWarning\\obj\\Release\\net6.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\MuteWarning\\obj\\Release\\net7.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_36251F64568045DCA563C145FA4CF823"
