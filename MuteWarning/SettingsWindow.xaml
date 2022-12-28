@@ -10,7 +10,8 @@
         ResizeMode="NoResize" 
         AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
-        MouseDown="Window_MouseDown">
+        MouseDown="Window_MouseDown"
+        Loaded="Window_Loaded">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.80"/>
     </Window.Background>
@@ -36,8 +37,7 @@
         <!--OBS Socket Password-->
         <TextBlock x:Name="ObsSocketPasswordTextBlock" HorizontalAlignment="Left" Margin="35,10,0,0" TextWrapping="Wrap" Text="OBS Socket Password"
                    VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="16" Grid.Row="2"/>
-        <TextBox x:Name="ObsSocketPasswordTextBox" Margin="35,35,35,0" TextWrapping="Wrap" Text="{Binding Source={x:Static local:Configuration.Settings}, Path=ObsSocketPassword, Mode=OneWay}"
-                 VerticalAlignment="Top" FontSize="16" Grid.Row="2" Height="24"/>
+        <PasswordBox x:Name="ObsSocketPasswordPasswordBox" Margin="35,35,35,0" VerticalAlignment="Top" FontSize="16" Grid.Row="2" Height="24"/>
         <!--Icon Image-->
         <Grid Grid.Row="3" Margin="0,0,0,0">
             <Grid.ColumnDefinitions>

@@ -36,10 +36,10 @@ namespace MuteWarning
         public SettingsWindow()
         {
             InitializeComponent();
-            CheckWindowsStartup();
+            GetStartWithWindows();
         }
 
-        private void CheckWindowsStartup()
+        private void GetStartWithWindows()
         {
             using var startupKey = Registry.CurrentUser.OpenSubKey(_startupRegistryKey, true);
             object value = startupKey.GetValue(nameof(MuteWarning));
@@ -70,62 +70,73 @@ namespace MuteWarning
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Configuration.Settings.ObsSocketUrl = ObsSocketUrlTextBox.Text?.Trim();
-            Configuration.Settings.ObsSocketPassword = ObsSocketPasswordTextBox.Text?.Trim();
+            Configuration.Settings.ObsSocketPassword = ObsSocketPasswordPasswordBox.Password?.Trim();
             Configuration.Settings.IconImagePath = IconImageWhiteRadioButton?.IsChecked ?? false ? Configuration.IconImageWhitePath : Configuration.IconImageBlackPath;
             Configuration.Settings.IsAutoConnectActive = IsAutoConnectActiveCheckBox.IsChecked ?? false;
             Configuration.Settings.AutoConnectIntervalInMinutes = int.TryParse(AutoConnectIntervalInMinutesTextBox.Text, out int result) ? result : 0;
 
-            //ResetIconPosition
-            if (ResetIconPositionCheckBox.IsChecked == true)
-            {
-                double screenWidth = SystemParameters.PrimaryScreenWidth;
-                double screenHeight = SystemParameters.PrimaryScreenHeight;
-                double windowWidth = Application.Current.MainWindow.Width;
-                double windowHeight = Application.Current.MainWindow.Height;
-
-                Point centerPoint = new((screenWidth / 2) - (windowWidth / 2), (screenHeight / 2) - (windowHeight / 2));
-                Configuration.Settings.IconPosition = centerPoint;
-                Application.Current.MainWindow.Left = centerPoint.X;
-                Application.Current.MainWindow.Top = centerPoint.Y;
-
-                ResetIconPositionCheckBox.IsChecked = false;
-            }
-
-            //StartWithWindows
-            if (StartWithWindowsCheckBox.IsChecked != StartWithWindow)
-            {
-                using var startupKey = Registry.CurrentUser.OpenSubKey(_startupRegistryKey, true);
-                using var startupApprovedKey = Registry.CurrentUser.OpenSubKey(_startupApprovedRegistryKey, true);
-
-                if (StartWithWindowsCheckBox.IsChecked == true)
-                {
-                    Assembly curAssembly = Assembly.GetExecutingAssembly();
-                    string location = Path.ChangeExtension(curAssembly.Location, "exe");
-                    startupKey.SetValue(nameof(MuteWarning), location);
-
-                    if (startupApprovedKey.GetValue(nameof(MuteWarning)) is byte[] binaryValue && binaryValue[0] != 2)
-                    {
-                        binaryValue[0] = 2;
-                        startupApprovedKey.SetValue(nameof(MuteWarning), binaryValue);
-                    }
-
-                    StartWithWindow = true;
-                }
-                else
-                {
-                    startupKey.DeleteValue(nameof(MuteWarning));
-                    startupApprovedKey.DeleteValue(nameof(MuteWarning), false);
-                    StartWithWindow = false;
-                }
-            }
+            CheckResetIconPositionChecked();
+            CheckStartWithWindowsChanged();
 
             Hide();
+        }
+
+        private void CheckResetIconPositionChecked()
+        {
+            if (ResetIconPositionCheckBox.IsChecked != true)
+            {
+                return;
+            }
+
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+            double windowWidth = Application.Current.MainWindow.Width;
+            double windowHeight = Application.Current.MainWindow.Height;
+
+            Point centerPoint = new((screenWidth / 2) - (windowWidth / 2), (screenHeight / 2) - (windowHeight / 2));
+            Configuration.Settings.IconPosition = centerPoint;
+            Application.Current.MainWindow.Left = centerPoint.X;
+            Application.Current.MainWindow.Top = centerPoint.Y;
+
+            ResetIconPositionCheckBox.IsChecked = false;
+        }
+
+        private void CheckStartWithWindowsChanged()
+        {
+            if (StartWithWindowsCheckBox.IsChecked == StartWithWindow)
+            {
+                return;
+            }
+
+            using var startupKey = Registry.CurrentUser.OpenSubKey(_startupRegistryKey, true);
+            using var startupApprovedKey = Registry.CurrentUser.OpenSubKey(_startupApprovedRegistryKey, true);
+
+            if (StartWithWindowsCheckBox.IsChecked != true)
+            {
+                startupKey.DeleteValue(nameof(MuteWarning));
+                startupApprovedKey.DeleteValue(nameof(MuteWarning), false);
+                StartWithWindow = false;
+
+                return;
+            }
+
+            Assembly curAssembly = Assembly.GetExecutingAssembly();
+            string location = Path.ChangeExtension(curAssembly.Location, "exe");
+            startupKey.SetValue(nameof(MuteWarning), location);
+
+            if (startupApprovedKey.GetValue(nameof(MuteWarning)) is byte[] binaryValue && binaryValue[0] != 2)
+            {
+                binaryValue[0] = 2;
+                startupApprovedKey.SetValue(nameof(MuteWarning), binaryValue);
+            }
+
+            StartWithWindow = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             ObsSocketUrlTextBox.Text = Configuration.Settings.ObsSocketUrl;
-            ObsSocketPasswordTextBox.Text = Configuration.Settings.ObsSocketPassword;
+            ObsSocketPasswordPasswordBox.Password = Configuration.Settings.ObsSocketPassword;
             IconImageWhiteRadioButton.IsChecked = !(IconImageBlackRadioButton.IsChecked = Configuration.IconImageBlackPath.Equals(Configuration.Settings.IconImagePath));
             IsAutoConnectActiveCheckBox.IsChecked = Configuration.Settings.IsAutoConnectActive;
             AutoConnectIntervalInMinutesTextBox.Text = Configuration.Settings.AutoConnectIntervalInMinutes?.ToString();
@@ -154,6 +165,11 @@ namespace MuteWarning
             }
 
             tb.Text = string.Concat(tb.Text.Where(char.IsDigit));
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ObsSocketPasswordPasswordBox.Password = Configuration.Settings.ObsSocketPassword;
         }
 
         #region INotifyPropertyChanged
